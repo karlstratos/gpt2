@@ -1,3 +1,7 @@
+data/*
+
+!data/wikitext-2-raw-v1/train_head10.txt
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
