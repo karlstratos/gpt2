@@ -14,5 +14,7 @@ def compute_perplexity(model, loader, device):
             num_preds = (labels > -100).sum().item() - X.size(0)
             loss_sum += output.loss.item() * num_preds
             num_preds_total += num_preds
+
+    # TODO: Should we divide by the # tokens sep by whitespace to be comparable?
     perp = math.exp(loss_sum / num_preds_total)
     return perp, loss_sum, num_preds_total
