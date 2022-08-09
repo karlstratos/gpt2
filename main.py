@@ -51,8 +51,10 @@ def main(args):
     config = AutoConfig.from_pretrained(args.model_name)
 
     # GPT2LMHeadModel
-    model = AutoModelForCausalLM.from_pretrained(args.model_name, config=config)
+    model = AutoModelForCausalLM.from_pretrained(args.model_name,
+                                                 config=config).to(device)
     logger.log(f'{count_parameters(model)} parameters')
+    logger.log(f'vocab size: {loader_train.dataset.vocab_size}')
 
     if is_distributed:
         logger.log('DDP wrapping')
@@ -68,6 +70,11 @@ def main(args):
     logger.log(f'Training for {num_training_steps} steps ', newline=False)
     logger.log(f'({num_warmup_steps} warmup steps if used)')
     logger.log('-' * 80)
+
+    if args.zeroshot:
+        val_perp, _, _ = compute_perplexity(model, loader_val, device)
+        test_perp, _, _ = compute_perplexity(model, loader_test, device)
+        logger.log(f'zero-shot: {val_perp:3.2f} val, {test_perp:3.2f} test')
 
     # Training
     step = 0
@@ -97,8 +104,7 @@ def main(args):
         log += f'lr: {lr:.5f} | '
         log += f'loss: {loss_avg:10.5f} | '
 
-        val_perp, _, num_preds = compute_perplexity(model, loader_val,
-                                                          device)
+        val_perp, _, num_preds = compute_perplexity(model, loader_val, device)
         log += f'val perp: {val_perp:3.2f} ({num_preds} preds)'
 
         if val_perp < val_perp_best:
@@ -123,9 +129,9 @@ if __name__ == '__main__':
                                  'gpt2-xl'])
     parser.add_argument('--batch_size', type=int, default=8)
     parser.add_argument('--max_length', type=int, default=1024)
-    parser.add_argument('--lr', type=float, default=5e-5)
+    parser.add_argument('--lr', type=float, default=.1)
     parser.add_argument('--num_warmup_steps', type=int, default=None)
-    parser.add_argument('--warmup_ratio', type=float, default=.1)
+    parser.add_argument('--warmup_ratio', type=float, default=0.)
     parser.add_argument('--optim', type=str, default='sgd',
                         choices=['sgd', 'adam'])
     parser.add_argument('--momentum', type=float, default=0.9)
@@ -134,6 +140,7 @@ if __name__ == '__main__':
     parser.add_argument('--num_workers', type=int, default=0)
     parser.add_argument('--seed', type=int, default=42)
     parser.add_argument('--no_shuffle', action='store_true')
+    parser.add_argument('--zeroshot', action='store_true')
     parser.add_argument('--epochs', type=int, default=20)
     parser.add_argument('--gpus', default='', type=str)
     args = parser.parse_args()
