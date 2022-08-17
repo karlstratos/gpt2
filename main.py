@@ -51,8 +51,12 @@ def main(args):
     config = AutoConfig.from_pretrained(args.model_name)
 
     # GPT2LMHeadModel
-    model = AutoModelForCausalLM.from_pretrained(args.model_name,
-                                                 config=config).to(device)
+    if args.scratch:
+        model = AutoModelForCausalLM.from_config(config).to(device)
+        logger.log(f'Training new model from scratch')
+    else:
+        model = AutoModelForCausalLM.from_pretrained(args.model_name,
+                                                     config=config).to(device)
     logger.log(f'{count_parameters(model)} parameters')
     logger.log(f'vocab size: {loader_train.dataset.vocab_size}')
 
@@ -71,10 +75,9 @@ def main(args):
     logger.log(f'({num_warmup_steps} warmup steps if used)')
     logger.log('-' * 80)
 
-    if args.zeroshot:
-        val_perp, _, _ = compute_perplexity(model, loader_val, device)
-        test_perp, _, _ = compute_perplexity(model, loader_test, device)
-        logger.log(f'zero-shot: {val_perp:3.2f} val, {test_perp:3.2f} test')
+    val_perp, _, _ = compute_perplexity(model, loader_val, device)
+    test_perp, _, _ = compute_perplexity(model, loader_test, device)
+    logger.log(f'zero-shot: {val_perp:3.2f} val, {test_perp:3.2f} test')
 
     # Training
     step = 0
@@ -140,7 +143,7 @@ if __name__ == '__main__':
     parser.add_argument('--num_workers', type=int, default=0)
     parser.add_argument('--seed', type=int, default=42)
     parser.add_argument('--no_shuffle', action='store_true')
-    parser.add_argument('--zeroshot', action='store_true')
+    parser.add_argument('--scratch', action='store_true')
     parser.add_argument('--epochs', type=int, default=20)
     parser.add_argument('--gpus', default='', type=str)
     args = parser.parse_args()
