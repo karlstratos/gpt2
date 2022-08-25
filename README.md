@@ -15,8 +15,8 @@ conda deactivate
 
 ```
 python main.py /tmp/model data/toy/ --max_length 37 --batch_size 7 --model_name gpt2 --epochs 3 --gpu 0
-torchrun --standalone --nnodes=1 --nproc_per_node=8 main.py scratch/model data/wikitext-2-raw-v1 --batch_size 1 --model_name gpt2 --epochs 3 --gpus 0,1,2,3,4,5,6,7 --lr 0.1  --zeroshot
-torchrun --standalone --nnodes=1 --nproc_per_node=8 main.py scratch/model data/wikitext-2-raw-v1 --batch_size 1 --model_name gpt2-medium --epochs 3 --gpus 0,1,2,3,4,5,6,7 --lr 0.1  --zeroshot
-torchrun --standalone --nnodes=1 --nproc_per_node=8 main.py scratch/model data/wikitext-2-raw-v1 --batch_size 1 --model_name gpt2-large --epochs 3 --gpus 0,1,2,3,4,5,6,7 --lr 0.1  --zeroshot
-torchrun --standalone --nnodes=1 --nproc_per_node=8 main.py scratch/model data/wikitext-2-raw-v1 --batch_size 1 --model_name gpt2-xl --epochs 3 --gpus 0,1,2,3,4,5,6,7 --lr 0.1  --zeroshot
+torchrun --standalone --nnodes=1 --nproc_per_node=8 main.py scratch/model data/wikitext-2-raw-v1 --batch_size 1 --model_name gpt2 --epochs 3 --gpus 0,1,2,3,4,5,6,7 --lr 0.1
+torchrun --standalone --nnodes=1 --nproc_per_node=8 main.py scratch/model data/wikitext-2-raw-v1 --batch_size 1 --model_name gpt2-medium --epochs 3 --gpus 0,1,2,3,4,5,6,7 --lr 0.1
+torchrun --standalone --nnodes=1 --nproc_per_node=8 main.py scratch/model data/wikitext-2-raw-v1 --batch_size 1 --model_name gpt2-large --epochs 3 --gpus 0,1,2,3,4,5,6,7 --lr 0.1
+torchrun --standalone --nnodes=1 --nproc_per_node=8 main.py scratch/model data/wikitext-2-raw-v1 --batch_size 1 --model_name gpt2-xl --epochs 3 --gpus 0,1,2,3,4,5,6,7 --lr 0.1
 ```
